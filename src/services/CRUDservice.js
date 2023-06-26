@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import db from '../models/index'
+import { resolveInclude } from 'ejs';
 
 const saltRounds = 10;
 
@@ -77,7 +78,7 @@ let getUpdateUserData = (data) => {
             //     user.firstName = data.firstName
             //     user.lastName = data.lastName
             //     user.address = data.address
-            //     await db.User.update(user)
+            //     await user.save()
             //     resolve()
             // }
             await db.User.update({
@@ -98,11 +99,29 @@ let getUpdateUserData = (data) => {
 
 }
 
+let deleteUserById = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (id) {
+                await db.User.destroy({
+                    where: {
+                        id: id
+                    }
+                });
+                resolve()
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 module.exports = {
     createNewUser: createNewUser,
     hashUserPassword: hashUserPassword,
     getAllUsers: getAllUsers,
     getUserInforById: getUserInforById,
     getUpdateUserData: getUpdateUserData,
+    deleteUserById: deleteUserById,
 
 }
