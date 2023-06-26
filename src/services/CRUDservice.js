@@ -51,9 +51,58 @@ let getAllUsers = () => {
     })
 }
 
+let getUserInforById = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await db.User.findOne({
+                where: { id: userId },
+                raw: true
+            })
+            if (user) {
+                resolve(user)
+            }
+            else console.log('User not found')
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+let getUpdateUserData = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // let user = await db.User.findOne({
+            //     where: { id: data.id }
+            // })
+            // if (user) {
+            //     user.firstName = data.firstName
+            //     user.lastName = data.lastName
+            //     user.address = data.address
+            //     await db.User.update(user)
+            //     resolve()
+            // }
+            await db.User.update({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                address: data.address,
+
+            }, {
+                where: { id: data.id }
+
+            })
+            resolve()
+
+        } catch (error) {
+            reject(error)
+        }
+    })
+
+}
+
 module.exports = {
     createNewUser: createNewUser,
     hashUserPassword: hashUserPassword,
     getAllUsers: getAllUsers,
+    getUserInforById: getUserInforById,
+    getUpdateUserData: getUpdateUserData,
 
 }

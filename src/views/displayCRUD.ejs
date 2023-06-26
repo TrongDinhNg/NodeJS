@@ -17,6 +17,8 @@
                 <th scope="col">FirstName</th>
                 <th scope="col">LastName</th>
                 <th scope="col">PhoneNumber</th>
+                <th></th>
+
             </tr>
         </thead>
         <tbody>
@@ -34,6 +36,11 @@
                     <td>
                         <%= dt.phoneNumber %>
                     </td>
+                    <td>
+                        <a type="button" class="btn btn-info" href="/edit-crud?id=<%= dt.id %>">Edit</a>
+                        <a type="button" class="btn btn-danger">Delete</a>
+                    </td>
+
                 </tr>
                 <% }); %>
         </tbody>
