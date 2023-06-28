@@ -1,13 +1,13 @@
-import bcrypt from 'bcrypt'
-import db from '../models/index'
-import { resolveInclude } from 'ejs';
+import bcrypt from "bcrypt";
+import db from "../models/index";
+import { resolveInclude } from "ejs";
 
 const saltRounds = 10;
 
 let createNewUser = async (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let hassPasswordFromBcrypt = await hashUserPassword(data.password)
+            let hassPasswordFromBcrypt = await hashUserPassword(data.password);
             await db.User.create({
                 email: data.email,
                 password: hassPasswordFromBcrypt,
@@ -15,59 +15,55 @@ let createNewUser = async (data) => {
                 lastName: data.lastName,
                 address: data.address,
                 phoneNumber: data.phoneNumber,
-                gender: data.gender === '1' ? true : false,
+                gender: data.gender === "1" ? true : false,
                 roleId: data.roleId,
-
-            })
-            resolve('Create a new user succeed!')
+            });
+            resolve("Create a new user succeed!");
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-
-}
+    });
+};
 
 let hashUserPassword = (password) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let hassPassword = await bcrypt.hash(password, saltRounds);
-            return resolve(hassPassword)
+            let hashPassword = await bcrypt.hash(password, saltRounds);
+            return resolve(hashPassword);
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};
 
 let getAllUsers = () => {
     return new Promise(async (resolve, reject) => {
         try {
             let users = db.User.findAll({
-                raw: true
-            })
-            resolve(users)
+                raw: true,
+            });
+            resolve(users);
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-
-    })
-}
+    });
+};
 
 let getUserInforById = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await db.User.findOne({
                 where: { id: userId },
-                raw: true
-            })
+                raw: true,
+            });
             if (user) {
-                resolve(user)
-            }
-            else console.log('User not found')
+                resolve(user);
+            } else console.log("User not found");
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};
 let getUpdateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -81,23 +77,22 @@ let getUpdateUserData = (data) => {
             //     await user.save()
             //     resolve()
             // }
-            await db.User.update({
-                firstName: data.firstName,
-                lastName: data.lastName,
-                address: data.address,
-
-            }, {
-                where: { id: data.id }
-
-            })
-            resolve()
-
+            await db.User.update(
+                {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                },
+                {
+                    where: { id: data.id },
+                },
+            );
+            resolve();
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-
-}
+    });
+};
 
 let deleteUserById = (id) => {
     return new Promise(async (resolve, reject) => {
@@ -105,16 +100,16 @@ let deleteUserById = (id) => {
             if (id) {
                 await db.User.destroy({
                     where: {
-                        id: id
-                    }
+                        id: id,
+                    },
                 });
-                resolve()
+                resolve();
             }
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};
 
 module.exports = {
     createNewUser: createNewUser,
@@ -123,5 +118,4 @@ module.exports = {
     getUserInforById: getUserInforById,
     getUpdateUserData: getUpdateUserData,
     deleteUserById: deleteUserById,
-
-}
+};
