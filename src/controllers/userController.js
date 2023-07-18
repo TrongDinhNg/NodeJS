@@ -68,10 +68,24 @@ let handleEditUser = async (req, res) => {
     }
 };
 
+let getAllcode = async (req, res) => {
+    try {
+        let data = await userService.getAllcodeService(req.query.type);
+        return res.status(200).json(data);
+    } catch (error) {
+        console.log("err getAllcode:", e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error Message from Server",
+        });
+    }
+};
+
 module.exports = {
     handleLogin: handleLogin,
     handleGetAllUsers: handleGetAllUsers,
     handleCreateNewUser: handleCreateNewUser,
     handleDeleteUser: handleDeleteUser,
     handleEditUser: handleEditUser,
+    getAllcode: getAllcode,
 };
