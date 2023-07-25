@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import db from "../models/index";
-import { resolveInclude } from "ejs";
 
 const saltRounds = 10;
 
@@ -15,7 +14,7 @@ let createNewUser = async (data) => {
                 lastName: data.lastName,
                 address: data.address,
                 phoneNumber: data.phoneNumber,
-                gender: data.gender === "1" ? true : false,
+                gender: data.gender,
                 roleId: data.roleId,
             });
             resolve("Create a new user succeed!");
