@@ -196,6 +196,10 @@ let updateUserData = (data) => {
                         firstName: data.firstName,
                         lastName: data.lastName,
                         address: data.address,
+                        roleId: data.roleId,
+                        gender: data.gender,
+                        positionId: data.positionId,
+                        phoneNumber: data.phoneNumber,
                     },
                     {
                         where: { id: data.id },
