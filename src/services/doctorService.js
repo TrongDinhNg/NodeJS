@@ -34,7 +34,54 @@ let getTopDoctorHome = (limit) => {
         }
     });
 };
+let getAllDoctor = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let doctors = await db.User.findAll({
+                where: { roleId: "R2" },
+                attributes: {
+                    exclude: ["password", "image"],
+                },
+                raw: true,
+            });
+            resolve({
+                errCode: 0,
+                data: doctors,
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+let saveInforDoctor = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.contentHTML || !data.contentMarkdown) {
+                console.log("data", data);
+                resolve({
+                    errCode: 1,
+                    errMessage: "Err from Server",
+                });
+            } else {
+                await db.Markdown.create({
+                    contentHTML: data.contentHTML,
+                    contentMarkdown: data.contentMarkdown,
+                    description: data.description,
+                    doctorId: data.doctorId,
+                });
+                resolve({
+                    errCode: 0,
+                    errMessage: "Save Infor Doctor Success!!!",
+                });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
+    getAllDoctor: getAllDoctor,
+    saveInforDoctor: saveInforDoctor,
 };
