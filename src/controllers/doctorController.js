@@ -52,10 +52,25 @@ let getInforDoctorById = async (req, res) => {
         });
     }
 };
+let getMarkdownByDoctorId = async (req, res) => {
+    try {
+        let infor = await doctorService.getMarkdownByDoctorId(
+            req.query.doctorId,
+        );
+        return res.status(200).json(infor);
+    } catch (e) {
+        console.log("e", e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "ERR from Server",
+        });
+    }
+};
 
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctor: getAllDoctor,
     postInforDoctor: postInforDoctor,
     getInforDoctorById: getInforDoctorById,
+    getMarkdownByDoctorId: getMarkdownByDoctorId,
 };

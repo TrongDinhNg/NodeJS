@@ -56,23 +56,53 @@ let getAllDoctor = () => {
 let saveInforDoctor = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.contentHTML || !data.contentMarkdown) {
+            if (
+                !data.doctorId ||
+                !data.contentHTML ||
+                !data.contentMarkdown ||
+                !data.action
+            ) {
                 console.log("data", data);
                 resolve({
                     errCode: 1,
                     errMessage: "Err from Server",
                 });
             } else {
-                await db.Markdown.create({
-                    contentHTML: data.contentHTML,
-                    contentMarkdown: data.contentMarkdown,
-                    description: data.description,
-                    doctorId: data.doctorId,
-                });
-                resolve({
-                    errCode: 0,
-                    errMessage: "Save Infor Doctor Success!!!",
-                });
+                if (data.action === "CREATE") {
+                    await db.Markdown.create({
+                        contentHTML: data.contentHTML,
+                        contentMarkdown: data.contentMarkdown,
+                        description: data.description,
+                        doctorId: data.doctorId,
+                    });
+                    resolve({
+                        errCode: 0,
+                        errMessage: "Save Infor Doctor Success!!!",
+                    });
+                } else if (data.action === "EDIT") {
+                    let md = await db.Markdown.findOne({
+                        where: { doctorId: data.doctorId },
+                        raw: false,
+                    });
+                    if (md) {
+                        md.contentHTML = data.contentHTML;
+                        md.contentMarkdown = data.contentMarkdown;
+                        md.description = data.description;
+                        md.doctorId = data.doctorId;
+                        md.updatedAt = new Date();
+                        await md.save();
+
+                        resolve({
+                            errCode: 0,
+                            errMessage: "Update Infor Doctor Success!!!",
+                        });
+                    } else {
+                        resolve({
+                            errCode: 2,
+                            errMessage: "Markdown not found!!!",
+                        });
+                    }
+                }
             }
         } catch (e) {
             reject(e);
@@ -92,7 +122,7 @@ let getInforDoctorById = (id) => {
                 let data = await db.User.findOne({
                     where: { id: id },
                     attributes: {
-                        exclude: ["password", "image"],
+                        exclude: ["password"],
                     },
                     include: [
                         {
@@ -109,13 +139,51 @@ let getInforDoctorById = (id) => {
                             attributes: ["valueEn", "valueVi"],
                         },
                     ],
-                    raw: true,
+                    raw: false,
                     nest: true,
                 });
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, "base64").toString(
+                        "binary",
+                    );
+                }
+                if (!data) {
+                    data = {};
+                }
                 resolve({
                     errCode: 0,
                     data: data,
                 });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+let getMarkdownByDoctorId = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!id) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing required parameter! ",
+                });
+            } else {
+                let markdown = await db.Markdown.findOne({
+                    where: { doctorId: id },
+                    raw: true,
+                });
+                if (markdown && markdown.data !== 0) {
+                    resolve({
+                        errCode: 0,
+                        data: markdown,
+                    });
+                } else {
+                    resolve({
+                        errCode: 1,
+                        errMessage: "markdown not found",
+                    });
+                }
             }
         } catch (e) {
             reject(e);
@@ -127,4 +195,5 @@ module.exports = {
     getAllDoctor: getAllDoctor,
     saveInforDoctor: saveInforDoctor,
     getInforDoctorById: getInforDoctorById,
+    getMarkdownByDoctorId: getMarkdownByDoctorId,
 };
