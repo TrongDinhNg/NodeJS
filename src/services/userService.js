@@ -24,8 +24,8 @@ let handleUserLogin = (email, password) => {
                         "email",
                         "firstName",
                         "password",
-                        "firstName",
                         "lastName",
+                        "roleId", // k nên lấy roleId, đang dùng cho mục đích phân quyền, check userInfor bên FE
                     ],
                     where: { email: email },
                     raw: true,

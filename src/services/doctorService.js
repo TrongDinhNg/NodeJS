@@ -1,4 +1,8 @@
 import db from "../models/index.js";
+import "dotenv/config";
+import _ from "lodash";
+
+let MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHome = (limit) => {
     return new Promise(async (resolve, reject) => {
@@ -190,10 +194,62 @@ let getMarkdownByDoctorId = (id) => {
         }
     });
 };
+let bulkCreateSchedule = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.arrSchedule) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing required parameters!",
+                });
+            } else {
+                let schedule = data.arrSchedule;
+                if (schedule && schedule.length > 0) {
+                    schedule = schedule.map((i) => {
+                        i.maxNumber = MAX_NUMBER_SCHEDULE;
+                        return i;
+                    });
+                }
+                //get all existed schedule
+                let existing = await db.Schedule.findAll({
+                    where: { doctorId: data.doctorId, date: data.fomatedDate },
+                    attributes: ["timeType", "date", "doctorId", "maxNumber"],
+                    raw: true,
+                });
+                //convert date
+                if (existing && existing.length > 0) {
+                    existing = existing.map((i) => {
+                        i.date = new Date(i.date).getTime();
+                        return i;
+                    });
+                }
+
+                //compare existed schedule with new schedule
+                let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                    return a.timeType === b.timeType && +a.date === +b.date;
+                });
+
+                //Create data
+                if (toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(toCreate);
+                }
+
+                resolve({
+                    errCode: 0,
+                    errMessage: "Create schedule success!",
+                });
+            }
+        } catch (error) {
+            console.log("error", error);
+            reject(error);
+        }
+    });
+};
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctor: getAllDoctor,
     saveInforDoctor: saveInforDoctor,
     getInforDoctorById: getInforDoctorById,
     getMarkdownByDoctorId: getMarkdownByDoctorId,
+    bulkCreateSchedule: bulkCreateSchedule,
 };
