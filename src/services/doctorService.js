@@ -216,13 +216,6 @@ let bulkCreateSchedule = (data) => {
                     attributes: ["timeType", "date", "doctorId", "maxNumber"],
                     raw: true,
                 });
-                //convert date
-                if (existing && existing.length > 0) {
-                    existing = existing.map((i) => {
-                        i.date = new Date(i.date).getTime();
-                        return i;
-                    });
-                }
 
                 //compare existed schedule with new schedule
                 let toCreate = _.differenceWith(schedule, existing, (a, b) => {
@@ -245,6 +238,43 @@ let bulkCreateSchedule = (data) => {
         }
     });
 };
+let getScheduleDoctorByDate = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing required parameters!",
+                });
+            } else {
+                let data = await db.Schedule.findAll({
+                    where: { doctorId: doctorId, date: date },
+                    include: [
+                        {
+                            model: db.Allcode,
+                            as: "timeTypeData",
+                            attributes: ["valueEn", "valueVi"],
+                        },
+                        // {
+                        //     model: db.User,
+                        //     as: "doctorData",
+                        //     attributes: ["firstName", "lastName"],
+                        // },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+                if (!data) data = [];
+                resolve({
+                    errCode: 0,
+                    data: data,
+                });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctor: getAllDoctor,
@@ -252,4 +282,5 @@ module.exports = {
     getInforDoctorById: getInforDoctorById,
     getMarkdownByDoctorId: getMarkdownByDoctorId,
     bulkCreateSchedule: bulkCreateSchedule,
+    getScheduleDoctorByDate: getScheduleDoctorByDate,
 };
