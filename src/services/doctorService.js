@@ -57,56 +57,100 @@ let getAllDoctor = () => {
         }
     });
 };
-let saveInforDoctor = (data) => {
+let checkRequiredFields = (inputData) => {
+    let arr = [
+        "doctorId",
+        "contentHTML",
+        "contentMarkdown",
+        "action",
+        "selectedPrice",
+        "selectedPayment",
+        "selectedProvince",
+        "nameClinic",
+        "addressClinic",
+        "note",
+    ];
+    let isValid = true;
+    let element = "";
+    for (let i = 0; i < arr.length; i++) {
+        if (!inputData[arr[i]]) {
+            isValid = false;
+            element = arr[i];
+            break;
+        }
+    }
+    return {
+        isValid,
+        element,
+    };
+};
+let saveInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (
-                !data.doctorId ||
-                !data.contentHTML ||
-                !data.contentMarkdown ||
-                !data.action
-            ) {
-                console.log("data", data);
+            let checkObj = checkRequiredFields(inputData);
+            if (checkObj.isValid === false) {
                 resolve({
                     errCode: 1,
-                    errMessage: "Err from Server",
+                    errMessage: `Missing parameter: ${checkObj.element}`,
                 });
             } else {
-                if (data.action === "CREATE") {
+                // upsert to Markdown
+                if (inputData.action === "CREATE") {
                     await db.Markdown.create({
-                        contentHTML: data.contentHTML,
-                        contentMarkdown: data.contentMarkdown,
-                        description: data.description,
-                        doctorId: data.doctorId,
+                        contentHTML: inputData.contentHTML,
+                        contentMarkdown: inputData.contentMarkdown,
+                        description: inputData.description,
+                        doctorId: inputData.doctorId,
                     });
-                    resolve({
-                        errCode: 0,
-                        errMessage: "Save Infor Doctor Success!!!",
-                    });
-                } else if (data.action === "EDIT") {
-                    let md = await db.Markdown.findOne({
-                        where: { doctorId: data.doctorId },
+                } else if (inputData.action === "EDIT") {
+                    let doctorMarkdown = await db.Markdown.findOne({
+                        where: { doctorId: inputData.doctorId },
                         raw: false,
                     });
-                    if (md) {
-                        md.contentHTML = data.contentHTML;
-                        md.contentMarkdown = data.contentMarkdown;
-                        md.description = data.description;
-                        md.doctorId = data.doctorId;
-                        md.updatedAt = new Date();
-                        await md.save();
-
-                        resolve({
-                            errCode: 0,
-                            errMessage: "Update Infor Doctor Success!!!",
-                        });
-                    } else {
-                        resolve({
-                            errCode: 2,
-                            errMessage: "Markdown not found!!!",
-                        });
+                    if (doctorMarkdown) {
+                        doctorMarkdown.contentHTML = inputData.contentHTML;
+                        doctorMarkdown.contentMarkdown =
+                            inputData.contentMarkdown;
+                        doctorMarkdown.description = inputData.description;
+                        doctorMarkdown.updateAt = new Date();
+                        await doctorMarkdown.save();
                     }
                 }
+
+                // upsert to Doctor_infor table
+                let doctorInfor = await db.Doctor_Infor.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false,
+                });
+
+                if (doctorInfor) {
+                    //update
+                    doctorInfor.doctorId = inputData.doctorId;
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+
+                    await doctorInfor.save();
+                } else {
+                    //create
+                    await db.Doctor_Infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    });
+                }
+
+                resolve({
+                    errCode: 0,
+                    errMessage: "Save infor doctor's success",
+                });
             }
         } catch (e) {
             reject(e);
