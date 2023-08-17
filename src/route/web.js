@@ -4,6 +4,7 @@ import HomeController from "../controllers/homeController.js";
 import UserController from "../controllers/userController.js";
 import DoctorController from "../controllers/doctorController.js";
 import patientController from "../controllers/patientController.js";
+import specialtyController from "../controllers/specialtyController.js";
 
 let router = Router();
 
@@ -59,6 +60,10 @@ let initWebRoutes = (app) => {
     router.post(
         "/api/verify-book-appointment",
         patientController.postVerifyBookAppointment,
+    );
+    router.post(
+        "/api/create-new-specialty",
+        specialtyController.createSpecialty,
     );
     return app.use("/", router);
 };
