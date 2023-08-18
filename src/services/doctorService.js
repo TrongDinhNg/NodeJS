@@ -69,6 +69,7 @@ let checkRequiredFields = (inputData) => {
         "nameClinic",
         "addressClinic",
         "note",
+        "specialtyId",
     ];
     let isValid = true;
     let element = "";
@@ -132,6 +133,8 @@ let saveInforDoctor = (inputData) => {
                     doctorInfor.nameClinic = inputData.nameClinic;
                     doctorInfor.addressClinic = inputData.addressClinic;
                     doctorInfor.note = inputData.note;
+                    doctorInfor.specialtyId = inputData.specialtyId;
+                    doctorInfor.clinicId = inputData.clinicId;
 
                     await doctorInfor.save();
                 } else {
@@ -144,6 +147,8 @@ let saveInforDoctor = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
+                        specialtyId: inputData.specialtyId,
+                        clinicId: inputData.clinicId,
                     });
                 }
 
