@@ -85,6 +85,11 @@ let initWebRoutes = (app) => {
         clinicController.getDetailClinicById,
     );
 
+    router.post(
+        "/api/send-examination-comfirmed",
+        DoctorController.sendConfirmedExamination,
+    );
+
     return app.use("/", router);
 };
 
