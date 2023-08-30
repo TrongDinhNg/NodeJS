@@ -1,6 +1,6 @@
 "use strict";
 
-require("dotenv/config");
+require("dotenv").config();
 module.exports = {
   development: {
     username: process.env.DB_USERNAME,
@@ -9,10 +9,7 @@ module.exports = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: process.env.DB_DIALECT,
-    timezone: "+07:00",
-    query: {
-      raw: true
-    }
+    timezone: "+07:00"
   },
   test: {
     username: "root",
