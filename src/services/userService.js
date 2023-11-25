@@ -1,5 +1,7 @@
 import db from "../models/index.js";
 import bcrypt from "bcrypt";
+import { CreateJWT } from "../middleware/JWT_Middleware.js";
+import "dotenv/config";
 
 const saltRounds = 10;
 let hashUserPassword = (password) => {
@@ -40,6 +42,14 @@ let handleUserLogin = (email, password) => {
                         user.password,
                     );
                     if (isPasswordMatch) {
+                        let payload = {
+                            email: user.email,
+                            roleId: user.roleId,
+                            expiresIn: process.env.JWT_EXPIRES_IN,
+                        };
+                        let token = await CreateJWT(payload);
+
+                        userData.access_token = token;
                         userData.errCode = 0;
                         userData.errMessage = "Good Job!!!!!";
                         delete user.password;
@@ -54,6 +64,7 @@ let handleUserLogin = (email, password) => {
                 userData.errMessage =
                     "Your's email isn't not exist in your system. Plz try other email";
             }
+            console.log("userData", userData);
             resolve(userData);
         } catch (error) {
             reject(error);

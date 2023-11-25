@@ -7,6 +7,10 @@ import patientController from "../controllers/patientController.js";
 import specialtyController from "../controllers/specialtyController.js";
 import clinicController from "../controllers/clinicController.js";
 
+import {
+    checkUserLoginJWT,
+    checkAdminJWT,
+} from "../middleware/JWT_Middleware.js";
 let router = Router();
 
 let initWebRoutes = (app) => {
@@ -23,7 +27,11 @@ let initWebRoutes = (app) => {
 
     router.post("/api/create-new-user", UserController.handleCreateNewUser);
     router.put("/api/edit-user", UserController.handleEditUser);
-    router.delete("/api/delete-user", UserController.handleDeleteUser);
+    router.delete(
+        "/api/delete-user",
+        checkAdminJWT,
+        UserController.handleDeleteUser,
+    );
 
     router.get("/api/allcode", UserController.getAllcode);
 

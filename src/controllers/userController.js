@@ -15,10 +15,15 @@ let handleLogin = async (req, res) => {
     }
 
     let userData = await userService.handleUserLogin(email, password);
+
+    //set cookies
+    res.cookie("JWT", userData.access_token, { httpOnly: true });
+
     return res.status(200).json({
         errorCode: userData.errCode,
         message: userData.errMessage,
         user: userData.user ? userData.user : {},
+        token: userData.access_token,
     });
 };
 
