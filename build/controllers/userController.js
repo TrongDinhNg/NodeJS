@@ -30,12 +30,17 @@ var handleLogin = /*#__PURE__*/function () {
           return _userService["default"].handleUserLogin(email, password);
         case 6:
           userData = _context.sent;
+          //set cookies
+          res.cookie("JWT", userData.access_token, {
+            httpOnly: true
+          });
           return _context.abrupt("return", res.status(200).json({
             errorCode: userData.errCode,
             message: userData.errMessage,
-            user: userData.user ? userData.user : {}
+            user: userData.user ? userData.user : {},
+            token: userData.access_token
           }));
-        case 8:
+        case 9:
         case "end":
           return _context.stop();
       }

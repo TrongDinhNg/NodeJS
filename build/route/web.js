@@ -7,6 +7,7 @@ var _doctorController = _interopRequireDefault(require("../controllers/doctorCon
 var _patientController = _interopRequireDefault(require("../controllers/patientController.js"));
 var _specialtyController = _interopRequireDefault(require("../controllers/specialtyController.js"));
 var _clinicController = _interopRequireDefault(require("../controllers/clinicController.js"));
+var _JWT_Middleware = require("../middleware/JWT_Middleware.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 //import { getHomePage, getCRUD, postCRUD } from "../controllers/homeController";
 
@@ -23,7 +24,7 @@ var initWebRoutes = function initWebRoutes(app) {
   router.get("/api/get-all-users", _userController["default"].handleGetAllUsers);
   router.post("/api/create-new-user", _userController["default"].handleCreateNewUser);
   router.put("/api/edit-user", _userController["default"].handleEditUser);
-  router["delete"]("/api/delete-user", _userController["default"].handleDeleteUser);
+  router["delete"]("/api/delete-user", _JWT_Middleware.checkAdminJWT, _userController["default"].handleDeleteUser);
   router.get("/api/allcode", _userController["default"].getAllcode);
   router.get("/api/top-doctor-home", _doctorController["default"].getTopDoctorHome);
   router.get("/api/get-all-doctor", _doctorController["default"].getAllDoctor);

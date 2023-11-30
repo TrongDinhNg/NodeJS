@@ -6,6 +6,7 @@ var _viewEngine = _interopRequireDefault(require("./config/viewEngine.js"));
 var _web = _interopRequireDefault(require("./route/web.js"));
 require("dotenv/config");
 var _connectDB = _interopRequireDefault(require("./config/connectDB.js"));
+var _cookieParser = _interopRequireDefault(require("cookie-parser"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 //import cors from "cors";
 
@@ -39,6 +40,7 @@ app.use(_bodyParser["default"].urlencoded({
   limit: "50mb",
   extended: false
 }));
+app.use((0, _cookieParser["default"])());
 (0, _viewEngine["default"])(app);
 (0, _web["default"])(app);
 (0, _connectDB["default"])();
